@@ -4,7 +4,7 @@
 https://codestates.notion.site/_AIB-8aaa720522d0496bb80a707f32dc7411
 
 ## Tokenizer() 풀이
-**`preprocessing()`** -> 텍스트 전처리 함수
+**`1-1.preprocessing()`** -> 텍스트 전처리 함수
 - input: 여러 영어 문장이 포함된 list
 - output: 각 문장을 토큰화한 결과로, nested list
 - 조건 1: 입력된 문장에 대해서 소문자로의 변환과 특수문자 제거를 수행합니다.
@@ -31,7 +31,7 @@ def preprocessing(self, sequences):
 
 
 ---------
-**`fit()`** -> 어휘 사전 구축 함수
+**`1-2.fit()`** -> 어휘 사전 구축 함수
 - input: 여러 영어 문장이 포함된 list
 - 조건 1: 위에서 만든 `preprocessing` 함수를 이용하여 각 문장에 대해 토큰화 수행
 - 조건 2: 각각의 토큰을 정수 인덱싱 하기 위한 어휘 사전(`self.word_dict`) 생성
@@ -72,7 +72,7 @@ word_dict 생성 방법
     - 조금 더 직관적이고, Pythonic한 dictionary comprehension 채택
 
 ---------
-**`transform()`** -> 어휘 사전을 활용하여 입력 문장을 정수 인덱싱
+**`1-3.transform()`** -> 어휘 사전을 활용하여 입력 문장을 정수 인덱싱
 - input: 여러 영어 문장이 포함된 list
 - output: 각 문장의 정수 인덱싱으로, nested list
 - 조건 1: 어휘 사전(`self.word_dict`)에 없는 단어는 'oov'의 index로 변환
@@ -93,10 +93,15 @@ def transform(self, sequences):
       else:
           raise Exception("Tokenizer instance is not fitted yet.")
 ```
+## 코드 작성 시 고려한 사항
+- 시간 복잡도를 고려하여 append() 함수 반복 대신
+- list comprehension 활용
+- 가독성 향상을 위해 파트별 lambda 함수 사용
+
 ---------
 
 ## TfidfVectorizer() 풀이
-**`fit()`** -> 입력 문장들을 이용해 IDF 행렬을 만드는 함수
+**`2-1.fit()`** -> 입력 문장들을 이용해 IDF 행렬을 만드는 함수
 - input: 여러 영어 문장이 포함된 list
 - 조건 1: IDF 행렬은 list 형태
     - ex) [토큰1에 대한 IDF 값, 토큰2에 대한 IDF 값, .... ]
@@ -127,8 +132,16 @@ def fit(self, sequences):
 
     self.fit_checker = True
 ```
+
+## 코드 작성 시 고려한 사항
+idf_matrix 내 음수 제거
+- 제공된 공식을 사용할 경우 모든 문장 내에 단어가 존재할 경우 idf 값은 음수가 됨
+- idf 값이 음수인 경우, tf-idf 값도 음수가 됨
+- 이 경우 음수는 의미 없는 값이기에 0으로 치환함
+
+
 ---------
-**`transform()`** -> 입력 문장들을 이용해 TF-IDF 행렬을 만드는 함수
+**`2-2.transform()`** -> 입력 문장들을 이용해 TF-IDF 행렬을 만드는 함수
 - input: 여러 영어 문장이 포함된 list
 - output : nested list 형태입니다.
     ex) [[tf-idf(1, 1), tf-idf(1, 2), tf-idf(1, 3)], [tf-idf(2, 1), tf-idf(2, 2), tf-idf(2, 3)]]
@@ -160,4 +173,12 @@ def transform(self, sequences):
     else:
         raise Exception("TfidfVectorizer instance is not fitted yet.")
 ```
+## 코드 작성 시 고려한 사항
+- 시간 복잡도를 고려하여 append() 함수 반복 대신
+- list comprehension 활용
+- tf * idf 계산 시에도 numpy array를 사용하여 반복문 없이 구현
+- 다만, 과제에 주어진 nested list 타입을 반환하기 위해 형변환 과정이 한
+- 가독성 향상을 위해 파트별 lambda 함수 사용
+
+
 ---------
