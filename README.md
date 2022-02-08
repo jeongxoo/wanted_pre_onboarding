@@ -19,6 +19,17 @@ def preprocessing(self, sequences):
     return result
 ```
 
+## 코드 작성 시 고려한 사항
+특수 문자 제거 방법
+- 정규식으로 특수 문자 제거
+- str.isalnum으로 특수 문제 제거
+    - 가독성 측면과 함수 실행 성능(속도) 측정 결과
+    - 정규식을 채택하여 사용
+- 형태소 분석기 사용
+    - nltk 라이브러리 사용 고려  
+    - but 직접 구현 가능 여부를 보여주는 것이 선발 과제에선 중요할 것으로 판단
+
+
 ---------
 **`fit()`** -> 어휘 사전 구축 함수
 - input: 여러 영어 문장이 포함된 list
@@ -42,6 +53,24 @@ def fit(self, sequences):
 
     self.fit_checker = True
 ```
+## 코드 작성 시 고려한 사항
+preprocessing된 토큰 집합 생성 방법 (중복 X)
+- reduce 사용
+    - 극악의 성능으로 배제
+- numpy(flatten, reshape 등) 사용
+    - 기존 배열이 비정형 배열로 해당 기능 사용 불가 
+- itertools 사용
+    - itertools.chain.from_iterable()
+    - itertools.chain()
+        - 두 가지 모두 성능은 비슷
+        - Pythonic한 Asterisk(*)을 사용하는 후자 채택
+
+word_dict 생성 방법
+- zip()
+- dictionary comprehension
+    - 두 방법 모두 성능은 유사
+    - 조금 더 직관적이고, Pythonic한 dictionary comprehension 채택
+
 ---------
 **`transform()`** -> 어휘 사전을 활용하여 입력 문장을 정수 인덱싱
 - input: 여러 영어 문장이 포함된 list
