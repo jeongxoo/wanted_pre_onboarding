@@ -1,0 +1,2 @@
+Bluetooth is a computing and telecommunications industry specification that describes how devices can communicate with each other.
+Devices that use Bluetooth include computers, a computer keyboard and mouse, person al digital assistants, and smartphones.
