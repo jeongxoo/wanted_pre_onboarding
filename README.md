@@ -1,7 +1,15 @@
 # wanted_pre_onboarding
 - 원티드 프리온보딩 AI/ML 선발 과제
-- 과제 설명
+- 과제 가이드라인
 https://codestates.notion.site/_AIB-8aaa720522d0496bb80a707f32dc7411
+
+## 최종 수정 내역
+- 주어진 format을 유지하도록 코드 작성 (문제 부분의 코드만 작성)
+- 주어진 조건 이외의 조건들은 고려하지 않도록 코드 수정
+- 각 class init에 추가된 변수 삭제 (지역 변수 혹은 주어진 변수만으로 코드 작성)
+- TF-IDF 값이 음수가 되도록 허용 (주어진 조건에 명시되지 않은 조건 삭제)
+- 가독성을 위한 람다 함수 사용 (클래스 내 메서드 정의X)
+- 최종 테스트 & DF 출력 함수 수정
 
 ## Tokenizer() 풀이
 **`1-1.preprocessing()`** -> 텍스트 전처리 함수
@@ -43,12 +51,10 @@ def preprocessing(self, sequences):
 def fit(self, sequences):
     self.fit_checker = False
 
-    # 조건 1 수행
     tokenized = self.preprocessing(sequences) 
-    self.token = list(set(itertools.chain(*tokenized)))
+    token = list(set(itertools.chain(*tokenized)))
 
-    # 조건 2 수행
-    _dict = {v: (i + 1) for i, v in enumerate(self.token)}
+    _dict = {v: (i + 1) for i, v in enumerate(token)}
     self.word_dict = dict(_dict, **self.word_dict) 
 
     self.fit_checker = True
@@ -90,14 +96,14 @@ def transform(self, sequences):
       result = []
       tokens = self.preprocessing(sequences)
 
-      if self.fit_checker:
-          fx_get_key = lambda x: x if x in self.word_dict.keys() else "oov"
-          fx_get_val = lambda x: self.word_dict[fx_get_key(x)]
-          result = [list(map(fx_get_val, t)) for t in tokens]
+      if self.fit_checker:  
+        fx_get_key = lambda x: x if x in self.word_dict.keys() else "oov"
+        fx_get_val = lambda x: self.word_dict[fx_get_key(x)]
+        result = [list(map(fx_get_val, t)) for t in tokens]
 
-          return result
+        return result
       else:
-          raise Exception("Tokenizer instance is not fitted yet.")
+        raise Exception("Tokenizer instance is not fitted yet.")
 ```
 ## 코드 작성 시 고려한 사항
 - 시간 복잡도를 고려하여 append() 함수 반복 대신
@@ -123,27 +129,33 @@ def transform(self, sequences):
 def fit(self, sequences):
     tokenized = self.tokenizer.fit_transform(sequences)
 
-    # list type의 df_matrix 생성
+    token = self.tokenizer.word_dict.keys()
+
     fx_df = lambda x: sum([1 for tk in tokenized if x in tk])
     fx_get_idx = lambda x: self.tokenizer.word_dict[x]
-    self.df_matrix = [fx_df(fx_get_idx(t)) for t in self.tokenizer.token]
+    df_matrix = [fx_df(fx_get_idx(t)) for t in token]
 
-    # idf 계산, 음수 처리 함수
     n = len(sequences)
     fx_idf = lambda x: math.log(n / (1 + x))
-    fx_filter = lambda x: x if x >= 0 else 0
-
-    # list type의 idf_matrix 생성
-    self.idf_matrix = [fx_filter(fx_idf(df)) for df in self.df_matrix]  
+    self.tfidf_matrix = [fx_idf(df) for df in df_matrix]  
 
     self.fit_checker = True
 ```
 
 ## 코드 작성 시 고려한 사항
-idf_matrix 내 음수 제거
-- 제공된 공식을 사용할 경우 모든 문장 내에 단어가 존재할 경우 idf 값은 음수가 됨
-- idf 값이 음수인 경우, tf-idf 값도 음수가 됨
-- 이 경우 음수는 의미 없는 값이기에 0으로 치환함
+idf_matrix를 저장하기 위한 변수에 대한 고민
+- 기존에는 init에서 self.idf_matrix를 추가해 사용
+- 다만 이는 주어진 조건을 벗어나는 행위이기에 수정 필요
+- 클래스 내에서 사용 가능한 변수 중 transform에서 최종 return하는 self.tfidf_matrix 사용
+- fit() -> transform() 순으로 함수가 실행
+- fit()에서 계산된 idf_matrix를 self.tfidf_matrix에 임시 저장
+- transform()에서 self.tfidf_matrix에 저장된 idf 값을 바탕으로 최종 tfidf value 계산 후 return
+
+~~idf_matrix 내 음수 제거~~
+- ~~제공된 공식을 사용할 경우 모든 문장 내에 단어가 존재할 경우 idf 값은 음수가 됨~~
+- ~~idf 값이 음수인 경우, tf-idf 값도 음수가 됨~~
+- ~~이 경우 음수는 의미 없는 값이기에 0으로 치환함~~
+
 
 
 ---------
@@ -162,17 +174,11 @@ idf_matrix 내 음수 제거
 def transform(self, sequences):
     if self.fit_checker:
         tokenized = self.tokenizer.transform(sequences)
-
-        # idf 함수 -> [idf(1,1), idf(1,2) ... idf(1,n)]
-        fx_get_idf = lambda y: np.array(list(map(lambda x: self.idf_matrix[x - 1], y)))
-
-        # tf 함수 -> [tf(1,1), tf(1,2) ... tf(1,n)]
+        
+        fx_get_idf = lambda y: np.array(list(map(lambda x: self.tfidf_matrix[x - 1], y)))
         fx_tf = lambda y: np.array(list(map(lambda x: y.count(x), y)))
-
-        # array type의 tf, idf 곱셈 연산 후 list 형 변환 함수
         fx_multi = lambda x, y: (x * y).tolist()
 
-        # tfidf 계산 함수, nested list 형태 출력
         self.tfidf_matrix = [fx_multi(fx_tf(tk), fx_get_idf(tk)) for tk in tokenized]
 
         return self.tfidf_matrix
@@ -180,8 +186,7 @@ def transform(self, sequences):
         raise Exception("TfidfVectorizer instance is not fitted yet.")
 ```
 ## 코드 작성 시 고려한 사항
-- 시간 복잡도를 고려하여 append() 함수 반복 대신
-- list comprehension 활용
+- 시간 복잡도를 고려하여 append() 함수 반복 대신 list comprehension 활용
 - tf * idf 계산 시에도 numpy array를 사용하여 반복문 없이 구현
 - 다만, 과제에 주어진 nested list 타입을 반환하기 위해 형변환 과정이 한
 - 가독성 향상을 위해 파트별 lambda 함수 사용
