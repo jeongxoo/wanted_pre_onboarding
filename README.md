@@ -1,7 +1,9 @@
 # wanted_pre_onboarding
 - 원티드 프리온보딩 AI/ML 선발 과제
 - 과제 가이드라인
-https://codestates.notion.site/_AIB-8aaa720522d0496bb80a707f32dc7411
+https://codestates.notion.site/_AIB-8aaa720522d0496bb80a707f32dc7411 
+<br>
+<br>
 
 ## 최종 수정 내역
 - 주어진 format을 유지하도록 코드 작성 (문제 부분의 코드만 작성)
@@ -10,6 +12,9 @@ https://codestates.notion.site/_AIB-8aaa720522d0496bb80a707f32dc7411
 - TF-IDF 값이 음수가 되도록 허용 (주어진 조건에 명시되지 않은 조건 삭제)
 - 가독성을 위한 람다 함수 사용 (클래스 내 메서드 정의X)
 - 최종 테스트 & DF 출력 함수 수정
+<br>
+<br>
+
 
 ## Tokenizer() 풀이
 **`1-1.preprocessing()`** -> 텍스트 전처리 함수
@@ -17,6 +22,7 @@ https://codestates.notion.site/_AIB-8aaa720522d0496bb80a707f32dc7411
 - output: 각 문장을 토큰화한 결과로, nested list
 - 조건 1: 입력된 문장에 대해서 소문자로의 변환과 특수문자 제거를 수행합니다.
 - 조건 2: 토큰화는 white space 단위로 수행합니다.
+<br>
 
 
 **`작성 코드`**
@@ -26,6 +32,8 @@ def preprocessing(self, sequences):
     result = [fx_make(s) for s in sequences]
     return result
 ```
+
+<br>
 
 ## 코드 작성 시 고려한 사항
 특수 문자 제거 방법
@@ -37,6 +45,9 @@ def preprocessing(self, sequences):
     - nltk 라이브러리 사용 고려  
     - but 직접 구현 가능 여부를 보여주는 것이 선발 과제에선 중요할 것으로 판단
 
+<br>
+<br>
+
 
 ---------
 **`1-2.fit()`** -> 어휘 사전 구축 함수
@@ -45,6 +56,7 @@ def preprocessing(self, sequences):
 - 조건 2: 각각의 토큰을 정수 인덱싱 하기 위한 어휘 사전(`self.word_dict`) 생성
     - 주어진 코드에 있는 `self.word_dict` 활용
 
+<br>
 
 **`작성 코드`**
 ```
@@ -59,6 +71,9 @@ def fit(self, sequences):
 
     self.fit_checker = True
 ```
+
+<br>
+
 ## 코드 작성 시 고려한 사항
 preprocessing된 토큰 집합 생성 방법 (중복 X)
 - reduce 사용
@@ -83,12 +98,16 @@ word_dict 생성 방법
 - ~~batch 기반의 문장 데이터를 계산하는 것으로 판단하고 계산 마다 클래스를 호출하는 것으로 변경~~
 - ~~따라서 word_dict, token에 대해서는 최대한 단순~~
 
+<br>
+<br>
+
 ---------
 **`1-3.transform()`** -> 어휘 사전을 활용하여 입력 문장을 정수 인덱싱
 - input: 여러 영어 문장이 포함된 list
 - output: 각 문장의 정수 인덱싱으로, nested list
 - 조건 1: 어휘 사전(`self.word_dict`)에 없는 단어는 'oov'의 index로 변환
 
+<br>
 
 **`작성 코드`**
 ```
@@ -105,10 +124,15 @@ def transform(self, sequences):
       else:
         raise Exception("Tokenizer instance is not fitted yet.")
 ```
+<br>
+
 ## 코드 작성 시 고려한 사항
 - 시간 복잡도를 고려하여 append() 함수 반복 대신
 - list comprehension 활용
 - 가독성 향상을 위해 파트별 lambda 함수 사용
+
+<br>
+<br>
 
 ---------
 
@@ -123,6 +147,8 @@ def transform(self, sequences):
     - **`n`** : 입력된 전체 문장 개수
 - 조건 3: 입력된 문장의 토큰화에는 문제 1에서 만든 Tokenizer 사용
 
+
+<br>
 
 **`작성 코드`**
 ```
@@ -142,6 +168,9 @@ def fit(self, sequences):
     self.fit_checker = True
 ```
 
+
+<br>
+
 ## 코드 작성 시 고려한 사항
 idf_matrix를 저장하기 위한 변수에 대한 고민
 - 기존에는 init에서 self.idf_matrix를 추가해 사용
@@ -156,6 +185,8 @@ idf_matrix를 저장하기 위한 변수에 대한 고민
 - ~~idf 값이 음수인 경우, tf-idf 값도 음수가 됨~~
 - ~~이 경우 음수는 의미 없는 값이기에 0으로 치환함~~
 
+<br>
+<br>
 
 
 ---------
@@ -168,7 +199,8 @@ idf_matrix를 저장하기 위한 변수에 대한 고민
 - 조건2 : 문제 2-1( `fit()`)에서 만든 IDF 행렬과 아래 식을 이용해 TF-IDF 행렬을 만드세요
     - **`tf-idf(d,t) = tf(d,t) * idf(d,t)`**
         
-        
+<br>
+
 **`작성 코드`**
 ```
 def transform(self, sequences):
@@ -185,11 +217,14 @@ def transform(self, sequences):
     else:
         raise Exception("TfidfVectorizer instance is not fitted yet.")
 ```
+
+<br>
+
+
 ## 코드 작성 시 고려한 사항
 - 시간 복잡도를 고려하여 append() 함수 반복 대신 list comprehension 활용
 - tf * idf 계산 시에도 numpy array를 사용하여 반복문 없이 구현
 - 다만, 과제에 주어진 nested list 타입을 반환하기 위해 형변환 과정이 한
 - 가독성 향상을 위해 파트별 lambda 함수 사용
 
-
----------
+<br>
