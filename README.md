@@ -35,8 +35,8 @@ test_data = ["the best Italian restaurant enjoy the best pasta",
     수정 후 형태
     |  | 토큰1 | 토큰2 | 토큰3 |
     | --- | --- | --- | --- |
-    | 문장1 | tf-idf(1,1) | tf-idf(1,2) | tf-idf(1,3) |
-    | 문장2 | tf-idf(2,1) | tf-idf(2,2) | tf-idf(2,3) |
+    | 문장1 | 문장1 - 토큰1의 tf-idf | 문장1 - 토큰2의 tf-idf | 문장1 - 토큰3의 tf-idf | 문장1 - 토큰4의 tf-idf | 문장1 - 토큰5의 tf-idf |
+    | 문장2 | 문장2 - 토큰1의 tf-idf | 문장2 - 토큰2의 tf-idf | 문장2 - 토큰3의 tf-idf | 문장2 - 토큰4의 tf-idf | 문장2 - 토큰5의 tf-idf |
 
 
 - 가독성을 위한 람다 함수 사용 (클래스 내 메서드 정의X)
@@ -184,15 +184,16 @@ def transform(self, sequences):
 def fit(self, sequences):
     tokenized = self.tokenizer.fit_transform(sequences)
 
-    token = self.tokenizer.word_dict.keys()
+    token_word = self.tokenizer.word_dict.keys()
 
     fx_df = lambda x: sum([1 for tk in tokenized if x in tk])
     fx_get_idx = lambda x: self.tokenizer.word_dict[x]
-    df_matrix = [fx_df(fx_get_idx(t)) for t in token]
+    df_matrix = [fx_df(fx_get_idx(tw)) for tw in token_word]
 
     n = len(sequences)
     fx_idf = lambda x: math.log(n / (1 + x))
     self.tfidf_matrix = [fx_idf(df) for df in df_matrix]  
+        
 
     self.fit_checker = True
 ```
@@ -236,11 +237,12 @@ def transform(self, sequences):
     if self.fit_checker:
         tokenized = self.tokenizer.transform(sequences)
         
-        fx_get_idf = lambda y: np.array(list(map(lambda x: self.tfidf_matrix[x - 1], y)))
-        fx_tf = lambda y: np.array(list(map(lambda x: y.count(x), y)))
-        fx_multi = lambda x, y: (x * y).tolist()
+        token_number = list(self.tokenizer.word_dict.values())  
+            
+        fx_tf = lambda x: np.array([x.count(tn) for tn in token_number])
+        fx_multi = lambda x, y: (x * np.array(y)).tolist()
 
-        self.tfidf_matrix = [fx_multi(fx_tf(tk), fx_get_idf(tk)) for tk in tokenized]
+        self.tfidf_matrix = [fx_multi(fx_tf(tk), self.tfidf_matrix) for tk in tokenized]
 
         return self.tfidf_matrix
     else:
