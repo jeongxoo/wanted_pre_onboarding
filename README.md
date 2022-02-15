@@ -33,8 +33,8 @@ test_data = ["the best Italian restaurant enjoy the best pasta",
     | 문장2 | 문장2 - 단어1 토큰의 tf-idf | 문장2 - 단어2 토큰의 tf-idf | 문장2 - 단어3 토큰의 tf-idf | 문장2 - 단어4 토큰의 tf-idf |    
 
     수정 후 형태
-    |  | 토큰1 | 토큰2 | 토큰3 |
-    | --- | --- | --- | --- |
+    |  | 토큰1 | 토큰2 | 토큰3 | 토큰4 | 토큰5 |
+    | --- | --- | --- | --- | --- | --- |
     | 문장1 | 문장1 - 토큰1의 tf-idf | 문장1 - 토큰2의 tf-idf | 문장1 - 토큰3의 tf-idf | 문장1 - 토큰4의 tf-idf | 문장1 - 토큰5의 tf-idf |
     | 문장2 | 문장2 - 토큰1의 tf-idf | 문장2 - 토큰2의 tf-idf | 문장2 - 토큰3의 tf-idf | 문장2 - 토큰4의 tf-idf | 문장2 - 토큰5의 tf-idf |
 
