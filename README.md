@@ -3,6 +3,20 @@
 - 과제 가이드라인
 https://codestates.notion.site/_AIB-8aaa720522d0496bb80a707f32dc7411 
 <br>
+
+## 결과 미리보기
+```
+# 테스트 데이터 형태 (input)
+test_data = ["the best Italian restaurant enjoy the best pasta",
+             "American restaurant enjoy the best hamburger",
+             "Korean restaurant enjoy the best korean bibimbap",
+             "the best the best American restaurant",
+             "world best hamburger Macdonald"]
+```
+
+### 결과 DataFrame으로 출력
+![스크린샷 2022-02-15 오후 2 51 14](https://user-images.githubusercontent.com/56291884/154000896-298c8946-5823-4096-97e7-2a51e5c87bd2.png)
+
 <br>
 
 ## 최종 수정 내역
@@ -10,6 +24,21 @@ https://codestates.notion.site/_AIB-8aaa720522d0496bb80a707f32dc7411
 - 주어진 조건 이외의 조건들은 고려하지 않도록 코드 수정
 - 각 class init에 추가된 변수 삭제 (지역 변수 혹은 주어진 변수만으로 코드 작성)
 - TF-IDF 값이 음수가 되도록 허용 (주어진 조건에 명시되지 않은 조건 삭제)
+- 최종 return하는 TF-IDF 값을 문제 요구 조건과 동일하게 변경
+
+    수정 전 형태
+
+    | 문장1 | 문장1 - 단어1 토큰의 tf-idf | 문장1 - 단어2 토큰의 tf-idf | 문장1 - 단어3 토큰의 tf-idf | - |
+    | --- | --- | --- | --- | --- |
+    | 문장2 | 문장2 - 단어1 토큰의 tf-idf | 문장2 - 단어2 토큰의 tf-idf | 문장2 - 단어3 토큰의 tf-idf | 문장2 - 단어4 토큰의 tf-idf |    
+
+    수정 후 형태
+    |  | 토큰1 | 토큰2 | 토큰3 |
+    | --- | --- | --- | --- |
+    | 문장1 | tf-idf(1,1) | tf-idf(1,2) | tf-idf(1,3) |
+    | 문장2 | tf-idf(2,1) | tf-idf(2,2) | tf-idf(2,3) |
+
+
 - 가독성을 위한 람다 함수 사용 (클래스 내 메서드 정의X)
 - 최종 테스트 & DF 출력 함수 수정
 <br>
